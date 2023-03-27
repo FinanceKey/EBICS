@@ -19,10 +19,4 @@
     <ProjectReference Include="..\libfintx.FinTS\libfintx.FinTS.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="Resources\BankMessage.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>
