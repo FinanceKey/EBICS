@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0010" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\libfintx.FinTSConfig\libfintx.FinTSConfig.csproj" />
     <ProjectReference Include="..\libfintx.Globals\libfintx.Globals.csproj" />
     <ProjectReference Include="..\libfintx.Logger\libfintx.Logger.csproj" />
