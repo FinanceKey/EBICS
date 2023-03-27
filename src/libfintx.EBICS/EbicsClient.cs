@@ -167,5 +167,14 @@ namespace libfintx.EBICS
                 return resp;
             }
         }
+
+        public VmkResponse VMK(VmkParams p)
+        {
+            using (new MethodLogger(Logger))
+            {
+                var resp = _commandHandler.Send<VmkResponse>(p);
+                return resp;
+            }
+        }
     }
 }

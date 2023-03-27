@@ -20,23 +20,11 @@
  * 	
  */
 
-using libfintx.EBICSConfig;
-using libfintx.EBICS.Parameters;
-using libfintx.EBICS.Responses;
+using System;
 
-namespace libfintx.EBICS
+namespace libfintx.EBICS.Parameters
 {
-    public interface IEbicsClient
+    public class VmkParams: Params
     {
-        Config Config { get; set; }
-        HpbResponse HPB(HpbParams p);
-        PtkResponse PTK(PtkParams p);
-        StaResponse STA(StaParams p);
-        CctResponse CCT(CctParams p);
-        IniResponse INI(IniParams p);
-        HiaResponse HIA(HiaParams p);
-        SprResponse SPR(SprParams p);
-        CddResponse CDD(CddParams p);
-        VmkResponse VMK(VmkParams p);
     }
 }
