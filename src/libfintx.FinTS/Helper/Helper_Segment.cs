@@ -235,7 +235,7 @@ namespace libfintx.FinTS
             return segments;
         }
 
-        internal static List<string> SplitEncryptedSegments(string message)
+        public static List<string> SplitEncryptedSegments(string message)
         {
             var encodedSegments = SplitSegments(message);
             if (encodedSegments.Any(s => s.StartsWith("HNVSD")))

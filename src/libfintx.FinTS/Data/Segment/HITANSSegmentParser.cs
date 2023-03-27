@@ -27,7 +27,7 @@ using System.Text.RegularExpressions;
 
 namespace libfintx.FinTS.Data.Segment
 {
-    internal class HITANSSegmentParser : ISegmentParser
+    public class HITANSSegmentParser : ISegmentParser
     {
         public Segment ParseSegment(Segment segment)
         {
