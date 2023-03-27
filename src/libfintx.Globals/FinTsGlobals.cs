@@ -58,9 +58,5 @@ namespace libfintx.Globals
 
         public static string Version { get; set; } = "1.0.0";
 
-        /// <summary>
-        /// Produktregistrierungsnummer. Replace it with you own id if available.
-        /// </summary>
-        public static string ProductId = "9FA6681DEC0CF3046BFC2F8A6";
     }
 }
