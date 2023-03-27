@@ -24,7 +24,7 @@ using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace libfintx.EBICSConfig
 {
@@ -113,6 +113,6 @@ namespace libfintx.EBICSConfig
             
         }
 
-        public override string ToString() => JsonConvert.SerializeObject(this, Formatting.Indented);
+        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }

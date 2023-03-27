@@ -20,7 +20,7 @@
  * 	
  */
 
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace libfintx.EBICS.Parameters
 {
@@ -35,6 +35,6 @@ namespace libfintx.EBICS.Parameters
 
         }
 
-        public override string ToString() => JsonConvert.SerializeObject(this, Formatting.Indented);
+        public override string ToString() => JsonSerializer.Serialize(this);
     }
 }
