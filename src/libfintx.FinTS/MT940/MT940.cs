@@ -30,8 +30,6 @@
 
 using libfintx.FinTS.Swift;
 using libfintx.Globals;
-using libfintx.Logger.Log;
-using libfintx.Logger.Trace;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -128,7 +126,6 @@ namespace libfintx.FinTS.Statement
                 }
                 catch (FormatException)
                 {
-                    Log.Write($"Invalid balance: {swiftData}");
                 }
 
                 if (swiftTag == "60F" || swiftTag == "60M")
@@ -664,7 +661,7 @@ namespace libfintx.FinTS.Statement
             return line;
         }
 
-        public static List<SwiftStatement> Serialize(string STA, string Account, bool writeToFile = false, bool pending = false)
+        public static List<SwiftStatement> Serialize(string STA, string Account, bool pending = false)
         {
             int LineCounter = 0;
 
@@ -676,32 +673,6 @@ namespace libfintx.FinTS.Statement
 
             if (STA == null || STA.Length == 0)
                 return SWIFTStatements;
-
-            string dir = null;
-            if (writeToFile)
-            {
-                dir = FinTsGlobals.ProgramBaseDir;
-
-                dir = Path.Combine(dir, "STA");
-
-                string filename = Path.Combine(dir, Helper.MakeFilenameValid(Account + "_" + DateTime.Now + ".STA"));
-
-                if (!Directory.Exists(dir))
-                {
-                    Directory.CreateDirectory(dir);
-                }
-
-                // STA
-                if (!File.Exists(filename))
-                {
-                    using (File.Create(filename))
-                    { };
-
-                    File.AppendAllText(filename, STA);
-                }
-                else
-                    File.AppendAllText(filename, STA);
-            }
 
             while (STA.Length > 0)
             {
@@ -810,7 +781,7 @@ namespace libfintx.FinTS.Statement
                 }
             }
 
-            if (Trace.Enabled)
+            if (1==0)
             {
                 foreach (SwiftStatement statement in SWIFTStatements)
                 {
@@ -848,26 +819,6 @@ namespace libfintx.FinTS.Statement
                             "TypeCode: " + TypeCode + " ' " +
                             "Amount: " + Amount + " ' " + "++ENDUMS++";
 
-                        dir = FinTsGlobals.ProgramBaseDir;
-                        dir = Path.Combine(dir, "MT940");
-
-                        string filename_ = Path.Combine(dir, Helper.MakeFilenameValid(Account + "_" + DateTime.Now + ".MT940"));
-
-                        if (!Directory.Exists(dir))
-                        {
-                            Directory.CreateDirectory(dir);
-                        }
-
-                        // MT940
-                        if (!File.Exists(filename_))
-                        {
-                            using (File.Create(filename_))
-                            { };
-
-                            File.AppendAllText(filename_, UMS);
-                        }
-                        else
-                            File.AppendAllText(filename_, UMS);
                     }
                 }
             }

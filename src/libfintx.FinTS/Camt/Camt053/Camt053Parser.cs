@@ -34,7 +34,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
-using libfintx.Logger.Log;
 
 namespace libfintx.FinTS.Camt.Camt053
 {
@@ -77,8 +76,6 @@ namespace libfintx.FinTS.Camt.Camt053
         /// <param name="filename"></param>
         public void ProcessFile(string filename)
         {
-            Log.Write("Read file " + filename);
-
             try
             {
                 XmlSerializer serializer = new XmlSerializer(typeof(Document));
@@ -256,7 +253,6 @@ namespace libfintx.FinTS.Camt.Camt053
                             else if (ownName != string.Empty)
                             {
                                 // sometimes donors write the project or recipient in the field where the organisation is supposed to be
-                                Log.Write("CrdtName is not like expected: " + tr.Description + " --- " + CrdtName);
                             }
                         }
 
@@ -293,8 +289,6 @@ namespace libfintx.FinTS.Camt.Camt053
                         }
 
                         stmt.Transactions.Add(tr);
-
-                        Log.Write("count : " + stmt.Transactions.Count.ToString());
                     }
                 }
 

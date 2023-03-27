@@ -30,7 +30,6 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using libfintx.Logger.Log;
 
 namespace libfintx.FinTS.Camt.Camt052
 {
@@ -104,8 +103,6 @@ namespace libfintx.FinTS.Camt.Camt052
         /// <param name="filename"></param>
         public void ProcessFile(string filename)
         {
-            Log.Write("Read file " + filename);
-
             Type documentType;
             if (File.ReadAllText(filename).Contains("urn:iso:std:iso:20022:tech:xsd:camt.052.001.08"))
             {
@@ -303,7 +300,6 @@ namespace libfintx.FinTS.Camt.Camt052
                             else if (ownName != string.Empty)
                             {
                                 // sometimes donors write the project or recipient in the field where the organisation is supposed to be
-                                Log.Write("CrdtName is not like expected: " + tr.Description + " --- " + CrdtName);
                             }
                         }
 
@@ -340,8 +336,6 @@ namespace libfintx.FinTS.Camt.Camt052
                         }
 
                         stmt.Transactions.Add(tr);
-
-                        Log.Write("count : " + stmt.Transactions.Count.ToString());
                     }
                 }
 
@@ -530,7 +524,6 @@ namespace libfintx.FinTS.Camt.Camt052
                             else if (ownName != string.Empty)
                             {
                                 // sometimes donors write the project or recipient in the field where the organisation is supposed to be
-                                Log.Write("CrdtName is not like expected: " + tr.Description + " --- " + CrdtName);
                             }
                         }
 
@@ -571,7 +564,6 @@ namespace libfintx.FinTS.Camt.Camt052
 
                         stmt.Transactions.Add(tr);
 
-                        Log.Write("count : " + stmt.Transactions.Count.ToString());
                     }
                 }
 

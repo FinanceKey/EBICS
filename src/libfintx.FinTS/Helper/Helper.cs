@@ -21,17 +21,6 @@
  * 	
  */
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
-using libfintx.FinTS.Camt;
-using libfintx.Globals;
-using libfintx.Logger.Log;
 
 namespace libfintx.FinTS
 {

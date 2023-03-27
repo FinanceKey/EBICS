@@ -33,7 +33,6 @@
     <ProjectReference Include="..\libfintx.EBICS\libfintx.EBICS.csproj" />
     <ProjectReference Include="..\libfintx.FinTS\libfintx.FinTS.csproj" />
     <ProjectReference Include="..\libfintx.Globals\libfintx.Globals.csproj" />
-    <ProjectReference Include="..\libfintx.Logger\libfintx.Logger.csproj" />
     <ProjectReference Include="..\libfintx.Security\libfintx.Security.csproj" />
     <ProjectReference Include="..\libfintx.Sepa\libfintx.ISO20022.csproj" />
     <ProjectReference Include="..\libfintx.Xml\libfintx.Xml.csproj" />
