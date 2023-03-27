@@ -23,7 +23,6 @@
 
 //#define WINDOWS
 
-using libfintx.FinTS.Data;
 using System;
 using System.Linq;
 using System.IO;
@@ -31,6 +30,10 @@ using Xunit;
 using Xunit.Abstractions;
 using System.Threading.Tasks;
 using libfintx.FinTS;
+using System.Security.Cryptography.X509Certificates;
+using libfintx.EBICS;
+using libfintx.EBICSConfig;
+using libfintx.EBICS.Parameters;
 
 #if (DEBUG && WINDOWS)
 using hbci = libfintx;
@@ -38,7 +41,6 @@ using hbci = libfintx;
 using System.Windows.Forms;
 #endif
 
-using SixLabors.ImageSharp;
 
 namespace libfintx.Tests
 {
@@ -51,212 +53,210 @@ namespace libfintx.Tests
             this.output = output;
         }
 
+
+
+
         [Fact]
-        public async void Test_Balance()
+        public void TestEbics()
         {
-            var connectionDetails = new ConnectionDetails()
-            {
-                Account = "xxx",
-                Blz = 76061482,
-                Bic = "GENODEF1HSB",
-                Iban = "xxx",
-                Url = "https://hbci11.fiducia.de/cgi-bin/hbciservlet",
-                HbciVersion = 300,
-                UserId = "xxx",
-                Pin = "xxx"
-            };
+            var config = new Config();
+            config.Address = "https://isotest.postfinance.ch/ebicsweb/ebicsweb";
+            config.TLS = true;
+            config.Insecure = true;
+            config.Version = EbicsVersion.H005;
+            config.Revision = EbicsRevision.Rev1;
+            config.User = new UserParams() { HostId = "PFEBICS", UserId = "PFC00484", PartnerId = "PFC00484", SystemId = "PFEBICS" };
 
-            var client = new FinTsClient(connectionDetails);
 
-            #region Balance
+            System.Security.Cryptography.X509Certificates.X509Certificate2 cert = new System.Security.Cryptography.X509Certificates.X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            /* Balance */
+            config.User.SignKeys = new SignKeyPair() { TimeStamp = DateTime.UtcNow, Version = SignVersion.A005, Certificate = cert };
+            var client = EbicsClient.Factory().Create(config);
 
-            var balance = await client.Balance(new TANDialog(WaitForTanAsync));
+            var iniParam = new IniParams();
+            iniParam.SecurityMedium = "0100";
+            var iniResponse = client.INI(iniParam);
 
-            Console.WriteLine("[ Balance ]");
-            Console.WriteLine();
-            Console.WriteLine(balance.Data.Balance);
-            Console.WriteLine();
 
-            #endregion
 
-            Console.ReadLine();
         }
 
         [Fact]
-        public async void Test_Accounts()
+        public void TestEbicsHIA()
         {
-            var connectionDetails = new ConnectionDetails()
-            {
-                // ...
-            };
+            var authCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+            var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            /* Sync */
-            var client = new FinTsClient(connectionDetails);
-
-            var accounts = await client.Accounts(new TANDialog(WaitForTanAsync));
-            foreach (var acc in accounts.Data)
+            var client = EbicsClient.Factory().Create(new Config
             {
-                output.WriteLine(acc.ToString());
-            }
+                Address = "https://isotest.postfinance.ch/ebicsweb/ebicsweb",
+                Insecure = true,
+                TLS = true,
+                User = new UserParams
+                {
+                    HostId = "PFEBICS",
+                    PartnerId = "PFC00484",
+                    UserId = "PFC00484",
+                    AuthKeys = new AuthKeyPair
+                    {
+                        Version = AuthVersion.X002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = authCert
+                    },
+                    CryptKeys = new CryptKeyPair
+                    {
+                        Version = CryptVersion.E002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = encCert
+                    }
+                }
+            });
+
+            var resp = client.HIA(new HiaParams());
+
         }
 
         [Fact]
-        public async void Test_Request_TANMediumName()
+        public void TestEbicsHPB()
         {
-            var connectionDetails = new ConnectionDetails()
+            var authCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+            var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+            var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+
+            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", "i3ElW60&nYI#u@51SM4QB^aMaLdq&tdq", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+            var rsa = cert.GetRSAPrivateKey();
+
+            var client = EbicsClient.Factory().Create(new Config
             {
-                Blz = 76050101,
-                Url = "https://banking-by1.s-fints-pt-by.de/fints30",
-                HbciVersion = 300,
-                UserId = "xxx",
-                Pin = "xxx"
-            };
+                Address = "https://isotest.postfinance.ch/ebicsweb/ebicsweb",
+                Insecure = true,
+                TLS = true,
+                User = new UserParams
+                {
+                    HostId = "PFEBICS",
+                    PartnerId = "PFC00484",
+                    UserId = "PFC00484",
+                    AuthKeys = new AuthKeyPair
+                    {
+                        Version = AuthVersion.X002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = authCert,
+                        PrivateKey = rsa
+                    },
+                    CryptKeys = new CryptKeyPair
+                    {
+                        Version = CryptVersion.E002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = encCert,
+                        PrivateKey = rsa
+                    },
+                    SignKeys = new SignKeyPair
+                    {
+                        Version = SignVersion.A005, // only A005 is supported right now
+                        TimeStamp = DateTime.Now,
+                        Certificate = signCert // internally we work with keys
+                    }
+                }
+            });
 
-            var client = new FinTsClient(connectionDetails);
-
-            #region TanMediumName
-
-            /* TANMediumname */
-
-            var tanmediumname = await client.RequestTANMediumName();
-
-            var t = tanmediumname.Data?.FirstOrDefault();
-
-            Console.WriteLine("[ TAN Medium Name ]");
-            Console.WriteLine();
-            Console.WriteLine(t);
-            Console.WriteLine();
-
-            #endregion
-
-            Console.ReadLine();
-        }
-
-        [Fact]
-        public void Test_PhotoTAN()
-        {
-            var PhotoCode = File.ReadAllText($"{AppDomain.CurrentDomain.BaseDirectory}\\..\\..\\assets\\matrixcode.txt");
-
-            var mCode = new MatrixCode(PhotoCode);
-
-            mCode.CodeImage.SaveAsPng(File.OpenWrite(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "matrixcode.png")));
-        }
-
-        [Fact]
-        public async void Test_PushTAN()
-        {
-            string receiver = string.Empty;
-            string receiverIBAN = string.Empty;
-            string receiverBIC = string.Empty;
-            decimal amount = 0;
-            string usage = string.Empty;
-
-            ConnectionDetails connectionDetails = new ConnectionDetails()
+            var hpbResp = client.HPB(new HpbParams());
+            if (hpbResp.TechnicalReturnCode != 0 || hpbResp.BusinessReturnCode != 0)
             {
-                AccountHolder = "Torsten Klinger",
-                Blz = 76050101,
-                Bic = "SSKNDE77XXX",
-                Iban = "xxx",
-                Url = "https://banking-by1.s-fints-pt-by.de/fints30",
-                HbciVersion = 300,
-                UserId = "xxx",
-                Pin = "xxx"
-            };
-
-            var client = new FinTsClient(connectionDetails);
-
-            receiver = "Klinger";
-            receiverIBAN = "xxx";
-            receiverBIC = "GENODEF1HSB";
-            amount = 1.0m;
-            usage = "TEST";
-
-            var result = await client.Synchronization();
-
-            if (result.IsSuccess)
-            {
-                string hirms = "921"; // -> pushTAN
-
-                var tanmediumname = await client.RequestTANMediumName();
-                client.HITAB = tanmediumname.Data.FirstOrDefault();
-
-                Console.WriteLine(client.Transfer(new TANDialog(WaitForTanAsync), receiver, receiverIBAN, receiverBIC, amount, usage, hirms));
-            }
-        }
-
-#if (WINDOWS)
-        static bool anonymous = false;
-
-        static string receiver = string.Empty;
-        static string receiverIBAN = string.Empty;
-        static string receiverBIC = string.Empty;
-        static decimal amount = 0;
-        static string usage = string.Empty;
-        public static ConnectionDetails connectionDetails;
-
-        public static PictureBox pictureBox { get; set; }
-
-        [Fact]
-        public void Test_Flicker()
-        {
-            connectionDetails = new ConnectionDetails()
-            {
-                AccountHolder = "Torsten Klinger",
-                Blz = 76061482,
-                BIC = "GENODEF1HSB",
-                IBAN = "xxx",
-                Url = "https://hbci11.fiducia.de/cgi-bin/hbciservlet",
-                HBCIVersion = 300,
-                UserId = "xxx",
-                Pin = "xxx"
-            };
-
-            receiver = "Klinger";
-            receiverIBAN = "xxx";
-            receiverBIC = "SSKNDE77XXX";
-            amount = 1.0m;
-            usage = "TEST";
-
-            HBCI.Assembly("libfintx", "1");
-
-            HBCI.Tracing(true);
-
-            if (HBCI.Synchronization(connectionDetails, anonymous))
-            {
-                Segment.HIRMS = "972"; // -> chip-TAN               
-
-                Image flickerImage = null;
-                output.WriteLine(EncodingHelper.ConvertToUTF8(HBCI.Transfer(connectionDetails, receiver, receiverIBAN, receiverBIC, amount, usage, Segment.HIRMS, anonymous, out flickerImage, 220, 160)));
-
-                Form frm = new Form();
-                frm.Size = new Size(flickerImage.Width + 5, flickerImage.Height + 5);
-                PictureBox pb = new PictureBox();
-                pb.Dock = DockStyle.Fill;
-                frm.Controls.Add(pb);
-                pb.Image = flickerImage;
-                Application.Run(frm);
+                // handle error
+                return;
             }
 
-            var timer = new System.Threading.Timer(
-                e => Output(),
-                null,
-                TimeSpan.Zero,
-                TimeSpan.FromSeconds(10));
+            client.Config.Bank = hpbResp.Bank; // set bank's public keys
+
+            // now issue other commands 
         }
 
-        void Output()
+        [Fact]
+        public void TestEbicsINI()
         {
-            output.WriteLine(HBCI.Transaction_Output());
-        }
-#endif
-        public async Task<string> WaitForTanAsync(TANDialog tanDialog)
-        {
-            foreach (var msg in tanDialog.DialogResult.Messages)
-                Console.WriteLine(msg);
+            var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            return Console.ReadLine();
+            var client = EbicsClient.Factory().Create(new Config
+            {
+                Address = "https://isotest.postfinance.ch/ebicsweb/ebicsweb",
+                Insecure = true,
+                TLS = true,
+                User = new UserParams
+                {
+                    HostId = "PFEBICS",
+                    PartnerId = "PFC00484",
+                    UserId = "PFC00484",
+                    SignKeys = new SignKeyPair
+                    {
+                        Version = SignVersion.A005, // only A005 is supported right now
+                        TimeStamp = DateTime.Now,
+                        Certificate = signCert // internally we work with keys
+                    }
+                }
+            });
+
+            var resp = client.INI(new IniParams());
+        }
+
+
+        [Fact]
+        public void TestEbicsSTA()
+        {
+            var authCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+            var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+            var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
+
+            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", "i3ElW60&nYI#u@51SM4QB^aMaLdq&tdq", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+            var rsa = cert.GetRSAPrivateKey();
+
+            var client = EbicsClient.Factory().Create(new Config
+            {
+                Address = "https://isotest.postfinance.ch/ebicsweb/ebicsweb",
+                Insecure = true,
+                TLS = true,
+                User = new UserParams
+                {
+                    HostId = "PFEBICS",
+                    PartnerId = "PFC00484",
+                    UserId = "PFC00484",
+                    AuthKeys = new AuthKeyPair
+                    {
+                        Version = AuthVersion.X002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = authCert,
+                        PrivateKey = rsa
+                    },
+                    CryptKeys = new CryptKeyPair
+                    {
+                        Version = CryptVersion.E002,
+                        TimeStamp = DateTime.Now,
+                        Certificate = encCert,
+                        PrivateKey = rsa
+                    },
+                    SignKeys = new SignKeyPair
+                    {
+                        Version = SignVersion.A005, // only A005 is supported right now
+                        TimeStamp = DateTime.Now,
+                        Certificate = signCert // internally we work with keys
+                    }
+                }
+            });
+
+            var hpbResp = client.HPB(new HpbParams());
+            if (hpbResp.TechnicalReturnCode != 0 || hpbResp.BusinessReturnCode != 0)
+            {
+                // handle error
+                return;
+            }
+
+            client.Config.Bank = hpbResp.Bank; // set bank's public keys
+
+            // now issue other commands
+
+            var staResp = client.STA(new StaParams() { StartDate = DateTime.UtcNow.AddDays(-30).Date, EndDate = DateTime.UtcNow.Date });
+
+
         }
     }
+
 }
