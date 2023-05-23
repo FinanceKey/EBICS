@@ -353,3 +353,4 @@ MigrationBackup/
 .ionide/
 src/libfintx.FinTS/.DS_Store
 .DS_Store
+/.runsettings
