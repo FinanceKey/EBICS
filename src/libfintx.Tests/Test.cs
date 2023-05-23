@@ -34,6 +34,8 @@ using System.Security.Cryptography.X509Certificates;
 using libfintx.EBICS;
 using libfintx.EBICSConfig;
 using libfintx.EBICS.Parameters;
+using System.Xml.Linq;
+using System.Security.Cryptography;
 
 #if (DEBUG && WINDOWS)
 using hbci = libfintx;
@@ -202,11 +204,20 @@ namespace libfintx.Tests
         [Fact]
         public void TestEbicsSTA()
         {
+            var runSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\..\\..\\..\\.runsettings");
+            var runSettingsXml = XDocument.Load(runSettingsPath);
+            var cert1password = runSettingsXml.Descendants("TestRunParameters").Elements("Parameter").FirstOrDefault(e => e.Attribute("name").Value == "Cert1-Password")?.Attribute("value").Value;
+
+            var cert1 = BuildSelfSignedServerCertificate("auth.ebics.financekey.com", cert1password, 999);
+            var rsa1 = cert1.GetRSAPrivateKey();
+
             var authCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
             var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
             var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", "i3ElW60&nYI#u@51SM4QB^aMaLdq&tdq", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+
+
+            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", cert1password, X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
             var rsa = cert.GetRSAPrivateKey();
 
             var client = EbicsClient.Factory().Create(new Config
@@ -253,10 +264,34 @@ namespace libfintx.Tests
 
             // now issue other commands
 
-            var staResp = client.STA(new StaParams() { StartDate = DateTime.UtcNow.AddDays(-30).Date, EndDate = DateTime.UtcNow.Date });
+//            var staResp = client.STA(new StaParams() { StartDate = DateTime.UtcNow.AddDays(-30).Date, EndDate = DateTime.UtcNow.Date });
+            var staResp = client.VMK(new VmkParams());
 
 
         }
+
+
+        private X509Certificate2 BuildSelfSignedServerCertificate(string certificateName, string password, int validityInDays = 365, string dns = null)
+        {
+            SubjectAlternativeNameBuilder sanBuilder = new SubjectAlternativeNameBuilder();
+
+            sanBuilder.AddDnsName(dns ?? certificateName);
+
+            var distinguishedName = new X500DistinguishedName($"CN={certificateName}");
+
+            using var rsa = RSA.Create(2048);
+            var request = new CertificateRequest(distinguishedName, rsa, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+            request.CertificateExtensions.Add(
+                new X509KeyUsageExtension(X509KeyUsageFlags.KeyEncipherment | X509KeyUsageFlags.DigitalSignature, false));
+
+            request.CertificateExtensions.Add(sanBuilder.Build());
+
+            var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(365));
+
+            return new X509Certificate2(certificate.Export(X509ContentType.Pfx, password), password);
+        }
+
     }
 
 }
