@@ -271,9 +271,9 @@ namespace libfintx.Tests
         }
 
 
-        private X509Certificate2 BuildSelfSignedServerCertificate(string certificateName, string password, int validityInDays = 365, string dns = null)
+        private static X509Certificate2 BuildSelfSignedServerCertificate(string certificateName, string password, int validityInDays = 365, string dns = null)
         {
-            SubjectAlternativeNameBuilder sanBuilder = new SubjectAlternativeNameBuilder();
+            var sanBuilder = new SubjectAlternativeNameBuilder();
 
             sanBuilder.AddDnsName(dns ?? certificateName);
 
@@ -287,7 +287,7 @@ namespace libfintx.Tests
 
             request.CertificateExtensions.Add(sanBuilder.Build());
 
-            var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(365));
+            var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddDays(-1), DateTimeOffset.UtcNow.AddDays(validityInDays));
 
             return new X509Certificate2(certificate.Export(X509ContentType.Pfx, password), password);
         }
