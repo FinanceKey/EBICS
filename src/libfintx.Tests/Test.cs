@@ -204,7 +204,7 @@ namespace libfintx.Tests
         [Fact]
         public void TestEbicsSTA()
         {
-            var runSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\..\\..\\..\\.runsettings");
+            var runSettingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\..\\..\\.runsettings");
             var runSettingsXml = XDocument.Load(runSettingsPath);
             var cert1password = runSettingsXml.Descendants("TestRunParameters").Elements("Parameter").FirstOrDefault(e => e.Attribute("name").Value == "Cert1-Password")?.Attribute("value").Value;
 
