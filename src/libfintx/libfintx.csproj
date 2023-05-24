@@ -13,6 +13,7 @@
     <PackageTags>banking, account, balance, transfer, payment, money, banking-api, ebics, open banking</PackageTags>
     <PackageProjectUrl>https://github.com/FinanceKey/EBICS</PackageProjectUrl>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>libEBICS</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
