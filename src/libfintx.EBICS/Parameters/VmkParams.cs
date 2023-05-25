@@ -2,7 +2,8 @@
  * 	
  *  This file is part of libfintx.
  *  
- *  Copyright (C) 2018 Bjoern Kuensting
+ *  Copyright (C) 2016 - 2023 Torsten Klinger
+ * 	E-Mail: torsten.klinger@googlemail.com
  *  
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU Lesser General Public

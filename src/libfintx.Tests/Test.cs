@@ -125,8 +125,7 @@ namespace libfintx.Tests
             var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
             var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", "i3ElW60&nYI#u@51SM4QB^aMaLdq&tdq", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
-            var rsa = cert.GetRSAPrivateKey();
+            var client = new FinTsClient(connectionDetails);
 
             var client = EbicsClient.Factory().Create(new Config
             {
