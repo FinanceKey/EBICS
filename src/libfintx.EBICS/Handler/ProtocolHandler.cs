@@ -320,7 +320,7 @@ namespace libfintx.EBICS.Handler
             {
                 var ctx = new Context {Cmd = cmd, State = new InitState(), Client = Client};
 
-                for (; ctx.State != null;)
+                while (ctx.State != null)
                 {
                     ctx.Handle();
                 }

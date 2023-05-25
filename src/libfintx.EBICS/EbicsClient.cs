@@ -32,7 +32,7 @@ namespace libfintx.EBICS
 {
     public class EbicsClientFactory
     {
-        private Func<Config, IEbicsClient> _ctor;
+        private readonly Func<Config, IEbicsClient> _ctor;
 
         public EbicsClientFactory(Func<Config, IEbicsClient> ctor)
         {
@@ -49,7 +49,6 @@ namespace libfintx.EBICS
     {
         private static readonly ILogger Logger = EbicsLogging.CreateLogger<EbicsClient>();
         private Config _config;
-        private HttpClient _httpClient;
         private readonly ProtocolHandler _protocolHandler;
         private readonly CommandHandler _commandHandler;
 
@@ -59,9 +58,9 @@ namespace libfintx.EBICS
             set
             {
                 _config = value ?? throw new ArgumentNullException(nameof(Config));
-                _httpClient = new HttpClient {BaseAddress = new Uri(_config.Address)};
+                var httpClient = new HttpClient {BaseAddress = new Uri(_config.Address)};
                 _commandHandler.Config = value;
-                _protocolHandler.Client = _httpClient;
+                _protocolHandler.Client = httpClient;
                 _commandHandler.ProtocolHandler = _protocolHandler;
                 var nsCfg = new NamespaceConfig();
                 switch (_config.Version)

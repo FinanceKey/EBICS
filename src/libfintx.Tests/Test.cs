@@ -27,9 +27,6 @@ using System;
 using System.Linq;
 using System.IO;
 using Xunit;
-using Xunit.Abstractions;
-using System.Threading.Tasks;
-using libfintx.FinTS;
 using System.Security.Cryptography.X509Certificates;
 using libfintx.EBICS;
 using libfintx.EBICSConfig;
@@ -37,27 +34,11 @@ using libfintx.EBICS.Parameters;
 using System.Xml.Linq;
 using System.Security.Cryptography;
 
-#if (DEBUG && WINDOWS)
-using hbci = libfintx;
-
-using System.Windows.Forms;
-#endif
-
 
 namespace libfintx.Tests
 {
     public class Test
     {
-        private readonly ITestOutputHelper output;
-
-        public Test(ITestOutputHelper output)
-        {
-            this.output = output;
-        }
-
-
-
-
         [Fact]
         public void TestEbics()
         {
@@ -125,7 +106,8 @@ namespace libfintx.Tests
             var encCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
             var signCert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.crt");
 
-            var client = new FinTsClient(connectionDetails);
+            var cert = new X509Certificate2(@"c:\Users\RonyMeyer\Documents\certificate\SelfSinged2026\financekey.nordea.pfx", "i3ElW60&nYI#u@51SM4QB^aMaLdq&tdq", X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+            var rsa = cert.GetRSAPrivateKey();
 
             var client = EbicsClient.Factory().Create(new Config
             {
@@ -197,6 +179,7 @@ namespace libfintx.Tests
             });
 
             var resp = client.INI(new IniParams());
+            Assert.True(resp.TechnicalReturnCode == 0);
         }
 
 
@@ -265,7 +248,7 @@ namespace libfintx.Tests
 
 //            var staResp = client.STA(new StaParams() { StartDate = DateTime.UtcNow.AddDays(-30).Date, EndDate = DateTime.UtcNow.Date });
             var staResp = client.VMK(new VmkParams());
-
+            Assert.True(staResp.TechnicalReturnCode == 0);
 
         }
 

@@ -29,7 +29,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Xml;
 using System.Xml.Linq;
-//using Ionic.Zlib;
 using Microsoft.Extensions.Logging;
 using libfintx.EBICS.Exceptions;
 using libfintx.EBICS.Handler;
@@ -154,27 +153,21 @@ namespace libfintx.EBICS.Commands
         {
             using (new MethodLogger(s_logger))
             {
-                using (var aesAlg = Aes.Create())
+                using var aesAlg = Aes.Create();
+                aesAlg.Mode = CipherMode.CBC;
+                aesAlg.Padding = PaddingMode.ANSIX923;
+                aesAlg.IV = new byte[16];
+                aesAlg.Key = transactionKey;
+                try
                 {
-                    aesAlg.Mode = CipherMode.CBC;
-                    aesAlg.Padding = PaddingMode.ANSIX923;
-                    aesAlg.IV = new byte[16];
-                    aesAlg.Key = transactionKey;
-                    try
-                    {
-                        using (var encryptor = aesAlg.CreateEncryptor())
-                        {
-                            return encryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
-                        }
-                    }
-                    catch (CryptographicException e)
-                    {
-                        aesAlg.Padding = PaddingMode.ISO10126;
-                        using (var encryptor = aesAlg.CreateEncryptor())
-                        {
-                            return encryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
-                        }
-                    }
+                    using var encryptor = aesAlg.CreateEncryptor();
+                    return encryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
+                }
+                catch (CryptographicException)
+                {
+                    aesAlg.Padding = PaddingMode.ISO10126;
+                    using var encryptor = aesAlg.CreateEncryptor();
+                    return encryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
                 }
             }
         }
@@ -226,7 +219,7 @@ namespace libfintx.EBICS.Commands
                             return decryptor.TransformFinalBlock(ciphertext, 0, ciphertext.Length);
                         }
                     }
-                    catch (CryptographicException e)
+                    catch (CryptographicException)
                     {
                         aesAlg.Padding = PaddingMode.ISO10126;
                         using (var decryptor = aesAlg.CreateDecryptor())

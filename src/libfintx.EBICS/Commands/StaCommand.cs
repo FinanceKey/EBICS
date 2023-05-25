@@ -106,14 +106,14 @@ namespace libfintx.EBICS.Commands
             {
                 try
                 {
+                    var reqs = new List<XmlDocument>();
+
                     if (_initLastSegment)
                     {
                         s_logger.LogDebug("lastSegment is {lastSegment}. Not creating any transfer requests",
                             _initLastSegment);
-                        return null;
+                        return reqs;
                     }
-
-                    var reqs = new List<XmlDocument>();
 
                     for (var i = 1; i < _numSegments; i++)
                     {

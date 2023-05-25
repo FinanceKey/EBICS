@@ -798,7 +798,6 @@ namespace libfintx.FinTS.Statement
                     foreach (SwiftTransaction transaction in statement.SwiftTransactions)
                     {
                         var PartnerName = transaction.PartnerName;
-                        var AccountCode_ = transaction.AccountCode;
                         var BankCode = transaction.BankCode;
                         var Description = transaction.Description;
                         var Text = transaction.Text;
