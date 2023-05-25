@@ -7,7 +7,7 @@
     <Copyright>Copyright © 2016 - 2023 Torsten Klinger, Copyright © 2023 Rony Meyer / FinanceKey</Copyright>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
     <Authors>Torsten Klinger, Rony Meyer</Authors>
     <RepositoryUrl>https://github.com/FinanceKey/EBICS</RepositoryUrl>
     <PackageTags>banking, account, balance, transfer, payment, money, banking-api, ebics, open banking</PackageTags>
