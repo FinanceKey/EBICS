@@ -1,18 +1,14 @@
 <img src="https://github.com/mrklintscher/libfintx/blob/master/res/logo.png" align="right">
 
-# libfintx
+# EBICS
 
-An C# based client library for **HBCI 2.2**, **FinTS 3.0**, **EBICS H004** and **EBICS H005**.
+An C# based client library for **EBICS H004** and **EBICS H005**.
 
-In 1995 the ZKA announced a common online banking standard called *Homebanking Computer Interface* (HBCI). In 2003 they published the next generation of this protocol standard and named it *Financial Transaction Services* (FinTS).
+The Electronic Banking Internet Communication Standard (EBICS) is a German / French transmission protocol developed by the German Banking Industry Committee for sending payment information between banks over the Internet. It grew out of the earlier BCS-FTAM protocol that was developed in 1995, with the aim of being able to use internet connections and TCP/IP. It is mandated for use by German banks and has also been adopted by France and Switzerland. [Wikipedia](https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard).
 
-Today most of all german banks support this online banking standards.
+This client library supports EBICS H004 and H005.
 
-The Electronic Banking Internet Communication Standard (EBICS) is a German transmission protocol developed by the German Banking Industry Committee for sending payment information between banks over the Internet. It grew out of the earlier BCS-FTAM protocol that was developed in 1995, with the aim of being able to use internet connections and TCP/IP. It is mandated for use by German banks and has also been adopted by France and Switzerland. [Wikipedia](https://en.wikipedia.org/wiki/Electronic_Banking_Internet_Communication_Standard).
-
-This client library supports all four APIs, HBCI 2.2, FinTS 3.0 and EBICS H004 and H005.
-
-It can be used to read the balance of a bank account, receive an account statement, and make a SEPA payment using **PIN/TAN** and **EBICS**.
+It can be used to read the balance of a bank account, receive an account statement, and make a SEPA payment using **EBICS**.
 
 # Usage
 
@@ -20,7 +16,7 @@ There are many reasons why you need to use a banking library which can exchange 
 
 # Target platforms
 
-* .NET Standard 2.0
+* .NET 6 (moved away from Standard 2.0 to use more native code)
 
 # Sample
 
@@ -105,17 +101,17 @@ The verification process is done by using the default [**WebRequest**](https://m
 # Limitations
 
 * Usage with certificates has been prepared but not completely implemented yet. It works with private/public keys.
-* Only version A005 for signatures can be used. A006 uses PSS padding, which is currently not supported by .NET Core 2.x. Bouncy Castle is only used for PEM file and certificate management.
+* Only version A005 for signatures can be used. A006 uses PSS padding, which is currently not supported by .NET Core 2.x. Dependency to Bouncy Castle has been removed and replaced with native code.
 * Only version E002 for encryption can be used.
 * Only version X002 for authentication can be used.
-* It was developed using EBICS Version H004, but H005 should work.
+* It was developed using EBICS Version H004. Any new feature will only be tested and developped for H005.
 
 # Copyright & License
 
-Copyright (c) 2016 - 2023 **Torsten Klinger**
+Copyright (c) 2016 - 2023 **Torsten Klinger**, 2023 **Rony Meyer**
 
 Licensed under **GNU LESSER GENERAL PUBLIC LICENSE Version 3, 29 June 2007**. Please read the LICENSE file.
 
 # Support
 
-You can contact me via [E-Mail](mailto:torsten.klinger@googlemail.com).
+You can contact me via [E-Mail](mailto:rony@financekey.com).
