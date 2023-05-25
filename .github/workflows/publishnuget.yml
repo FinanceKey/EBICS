@@ -31,6 +31,9 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
 
+    # First build so that we have all the DDL in the bin output folder which is required for the pack command
+    - run: dotnet build ./src --configuration Release
+
     # Create the NuGet package in the folder from the environment variable NuGetDirectory
     - run: dotnet pack ./src --configuration Release --output ${{ env.NuGetDirectory }}
 
