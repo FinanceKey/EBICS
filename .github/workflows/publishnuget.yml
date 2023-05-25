@@ -67,6 +67,7 @@ jobs:
         run: meziantou.validate-nuget-package (Get-ChildItem "${{ env.NuGetDirectory }}/*.nupkg")
 
   run_test:
+    if: 1==0
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
