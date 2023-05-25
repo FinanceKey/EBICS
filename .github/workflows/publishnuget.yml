@@ -86,8 +86,7 @@ jobs:
       - name: Print event name
         shell: bash
         run: |
-          echo "Workflow status of build_release_qa_Core7-RC1 is ${{ github.event_name }}"
-
+          echo "Event name is ${{ github.event_name }}"
 
   deploy:
     # Publish only when creating a GitHub Release
