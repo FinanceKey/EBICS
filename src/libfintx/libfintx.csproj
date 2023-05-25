@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Company>Torsten Klinger, FinanceKey</Company>
     <Description>C# based client library for EBICS H004 and EBICS H005.</Description>
     <Copyright>Copyright © 2016 - 2023 Torsten Klinger, Copyright © 2023 Rony Meyer / FinanceKey</Copyright>
     <AssemblyVersion>1.0.0</AssemblyVersion>
     <FileVersion>1.0.0</FileVersion>
-    <Version>1.0.0</Version>
+    <Version>1.0.3</Version>
     <Authors>Torsten Klinger, Rony Meyer</Authors>
     <RepositoryUrl>https://github.com/FinanceKey/EBICS</RepositoryUrl>
     <PackageTags>banking, account, balance, transfer, payment, money, banking-api, ebics, open banking</PackageTags>
@@ -22,13 +22,35 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\libfintx.EBICSConfig\libfintx.EBICSConfig.csproj" />
-    <ProjectReference Include="..\libfintx.EBICS\libfintx.EBICS.csproj" />
-    <ProjectReference Include="..\libfintx.FinTS\libfintx.FinTS.csproj" />
-    <ProjectReference Include="..\libfintx.Globals\libfintx.Globals.csproj" />
-    <ProjectReference Include="..\libfintx.Security\libfintx.Security.csproj" />
-    <ProjectReference Include="..\libfintx.Sepa\libfintx.ISO20022.csproj" />
-    <ProjectReference Include="..\libfintx.Xml\libfintx.Xml.csproj" />
+    <ProjectReference Include="..\libfintx.EBICSConfig\libfintx.EBICSConfig.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.EBICS\libfintx.EBICS.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.FinTS\libfintx.FinTS.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.Globals\libfintx.Globals.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.Security\libfintx.Security.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.Sepa\libfintx.ISO20022.csproj" PrivateAssets="All" />
+    <ProjectReference Include="..\libfintx.Xml\libfintx.Xml.csproj" PrivateAssets="All" />
   </ItemGroup>
 
-</Project>
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+    <!-- Add symbol files to nuget package -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="BuildOnlySettings;ResolveReferences">
+    <ItemGroup>
+      <!-- Filter out unnecessary files -->
+      <_ReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths-&gt;WithMetadataValue('ReferenceSourceTarget', 'ProjectReference')-&gt;WithMetadataValue('PrivateAssets', 'All'))" />
+    </ItemGroup>
+    <!-- Print batches for debug purposes -->
+    <Message Text="Batch for .nupkg: ReferenceCopyLocalPaths = @(_ReferenceCopyLocalPaths), ReferenceCopyLocalPaths.DestinationSubDirectory = %(_ReferenceCopyLocalPaths.DestinationSubDirectory) Filename = %(_ReferenceCopyLocalPaths.Filename) Extension = %(_ReferenceCopyLocalPaths.Extension)" Importance="High" Condition="'@(_ReferenceCopyLocalPaths)' != ''" />
+
+    <ItemGroup>
+      <!-- Add file to package with consideration of sub folder. If empty, the root folder is chosen. -->
+      <BuildOutputInPackage Include="@(_ReferenceCopyLocalPaths)" TargetPath="%(_ReferenceCopyLocalPaths.DestinationSubDirectory)" />
+    </ItemGroup>
+  </Target>
+  
+  </Project>

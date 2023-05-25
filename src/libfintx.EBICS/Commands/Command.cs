@@ -29,13 +29,14 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.Xml;
 using System.Xml;
 using System.Xml.Linq;
-using Ionic.Zlib;
+//using Ionic.Zlib;
 using Microsoft.Extensions.Logging;
 using libfintx.EBICS.Exceptions;
 using libfintx.EBICS.Handler;
 using libfintx.EBICS.Responses;
 using libfintx.EBICSConfig;
 using libfintx.Xml;
+using System.IO.Compression;
 
 namespace libfintx.EBICS.Commands
 {
@@ -237,35 +238,28 @@ namespace libfintx.EBICS.Commands
             }
         }
 
-        protected byte[] Decompress(byte[] buffer)
+        protected static byte[] Decompress(byte[] buffer)
         {
             using (new MethodLogger(s_logger))
             {
-                using (var output = new MemoryStream())
-                {
-                    using (var zs = new ZlibStream(output, CompressionMode.Decompress))
-                    {
-                        zs.Write(buffer, 0, buffer.Length);
-                    }
+                using var output = new MemoryStream();
+                var stream = new MemoryStream(buffer);
 
-                    return output.ToArray();
-                }
+                using var decompressor = new ZLibStream(stream, CompressionMode.Decompress);
+                decompressor.CopyTo(output);
+                return output.ToArray();
             }
         }
 
-        protected byte[] Compress(byte[] buffer)
+        protected static byte[] Compress(byte[] buffer)
         {
             using (new MethodLogger(s_logger))
             {
-                using (var output = new MemoryStream())
-                {
-                    using (var zs = new ZlibStream(output, CompressionMode.Compress))
-                    {
-                        zs.Write(buffer, 0, buffer.Length);
-                    }
-
-                    return output.ToArray();
-                }
+                using var output = new MemoryStream();
+                var stream = new MemoryStream(buffer);
+                using var compressor = new ZLibStream(output, CompressionMode.Compress);
+                stream.CopyTo(compressor);
+                return output.ToArray();
             }
         }
 
